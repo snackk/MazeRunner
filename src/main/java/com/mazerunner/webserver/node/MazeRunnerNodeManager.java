@@ -38,7 +38,7 @@ public class MazeRunnerNodeManager {
             e.printStackTrace();
         }
 
-        QName qname = new QName("http://service/", "MazeRunnerImplService");
+        QName qname = new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplService");
         MazeRunnerService mazeRunnerService = new MazeRunnerImplService(newEndpoint, qname).getMazeRunnerImplPort();
 
         return mazeRunnerService.solveMaze(request);
