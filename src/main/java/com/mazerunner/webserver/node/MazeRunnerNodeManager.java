@@ -2,6 +2,7 @@ package com.mazerunner.webserver.node;
 
 import com.mazerunner.webserver.ws.MazeRunnerImplService;
 import com.mazerunner.webserver.ws.MazeRunnerService;
+import com.mazerunner.webserver.exceptions.NoActiveNodesException;
 
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
@@ -17,6 +18,7 @@ public class MazeRunnerNodeManager {
     public static List<String> getMachinesIp() {
         return machinesIp;
     }
+    public static int currentMachineIndex = 0;
 
     protected MazeRunnerNodeManager(){
 
@@ -28,8 +30,19 @@ public class MazeRunnerNodeManager {
         return nodesManager;
     }
 
-    public String solveMazeOnNode(String request){
-        String workerIp = getMachinesIp().get(getMachinesIp().size() - 1);
+    public String solveMazeOnNode(String request) throws NoActiveNodesException{
+
+        if(machinesIp.size() == 0){
+            throw new NoActiveNodesException();
+        }
+
+        String workerIp = machinesIp.get(currentMachineIndex);
+
+        if(currentMachineIndex == machinesIp.size() -1)
+            currentMachineIndex = 0;
+        else
+            currentMachineIndex++;
+        System.out.println(currentMachineIndex);
 
         URL newEndpoint = null;
         try {
@@ -37,15 +50,14 @@ public class MazeRunnerNodeManager {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        System.out.println("Sending request " + request + " to " + workerIp);
 
         QName qname = new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplService");
         MazeRunnerService mazeRunnerService = new MazeRunnerImplService(newEndpoint, qname).getMazeRunnerImplPort();
-
         return mazeRunnerService.solveMaze(request);
     }
 
     public void registerIp(String ip){
-
         for(String e : getMachinesIp()){
             if(e.equals(ip)){
                 System.out.println(e + " was already up.");
@@ -53,6 +65,7 @@ public class MazeRunnerNodeManager {
             }
         }
         getMachinesIp().add(ip);
+
         System.out.println(ip + " is up.");
     }
 }
