@@ -14,13 +14,14 @@ import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceType;
+import com.amazonaws.services.ec2.model.RebootInstancesRequest;
+import com.amazonaws.services.ec2.model.RebootInstancesResult;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.Tag;
-import com.amazonaws.services.lambda.model.EC2ThrottledException;
 
 public class InstancesOperations {
 
@@ -125,6 +126,27 @@ public class InstancesOperations {
 	        instance_id, ami_id);		
 	}
 	
+	public void rebootInstance(String instance_id){
+		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+		try {
+		    credentialsProvider.getCredentials();
+		} catch (Exception e) {
+		    throw new AmazonClientException(
+			    "Cannot load the credentials from the credential profiles file. " +
+			    "Please make sure that your credentials file is at the correct " +
+			    "location (~/.aws/credentials), and is in valid format.",
+			    e);
+		}
+		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
+
+        RebootInstancesRequest request = new RebootInstancesRequest();
+        request.withInstanceIds(instance_id);
+
+        RebootInstancesResult response = ec2.rebootInstances(request);
+        
+        System.out.printf("Successfully rebooted instance %s", instance_id);
+	}
+	
 	public void startInstance(String instance_id){
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
@@ -161,5 +183,7 @@ public class InstancesOperations {
 		request.withInstanceIds(instance_id);
 
 		ec2.stopInstances(request);
+		
+		 System.out.printf("Successfully stop instance %s", instance_id);
 	}
 }
