@@ -9,10 +9,18 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.StartInstancesRequest;
+import com.amazonaws.services.ec2.model.StopInstancesRequest;
+import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.lambda.model.EC2ThrottledException;
 
 public class InstancesOperations {
 
@@ -76,5 +84,82 @@ public class InstancesOperations {
                 instance.getPrivateIpAddress(),
                 instance.getPublicIpAddress());
             System.out.println("");
+	}
+	
+	public void createInstance(){
+		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+		try {
+		    credentialsProvider.getCredentials();
+		} catch (Exception e) {
+		    throw new AmazonClientException(
+			    "Cannot load the credentials from the credential profiles file. " +
+			    "Please make sure that your credentials file is at the correct " +
+			    "location (~/.aws/credentials), and is in valid format.",
+			    e);
+		}
+		String ami_id = ""; //FIXME
+		RunInstancesRequest run_request = new RunInstancesRequest();
+		run_request.setImageId(ami_id);
+		run_request.setInstanceType(InstanceType.T1Micro);
+		run_request.setMaxCount(1);
+		run_request.setMinCount(1);
+		
+		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
+
+		RunInstancesResult response = ec2.runInstances(run_request);
+
+		String instance_id = response.getReservation().getReservationId();
+
+		//FIX ME TAG
+		Tag tag = new Tag();
+		tag.setKey("Name");
+	    tag.setValue(" ");
+
+		CreateTagsRequest tag_request = new CreateTagsRequest();
+		    tag_request.withTags(tag);
+
+		ec2.createTags(tag_request);
+		startInstance(instance_id);
+	    System.out.printf(
+	        "Successfully started EC2 instance %s based on AMI %s",
+	        instance_id, ami_id);		
+	}
+	
+	public void startInstance(String instance_id){
+		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+		try {
+		    credentialsProvider.getCredentials();
+		} catch (Exception e) {
+		    throw new AmazonClientException(
+			    "Cannot load the credentials from the credential profiles file. " +
+			    "Please make sure that your credentials file is at the correct " +
+			    "location (~/.aws/credentials), and is in valid format.",
+			    e);
+		}
+		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
+
+		StartInstancesRequest request = new StartInstancesRequest();
+		request.withInstanceIds(instance_id);
+
+		ec2.startInstances(request);
+	}
+	
+	public void stopInstance(String instance_id){
+		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+		try {
+		    credentialsProvider.getCredentials();
+		} catch (Exception e) {
+		    throw new AmazonClientException(
+			    "Cannot load the credentials from the credential profiles file. " +
+			    "Please make sure that your credentials file is at the correct " +
+			    "location (~/.aws/credentials), and is in valid format.",
+			    e);
+		}
+		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
+		
+		StopInstancesRequest request = new StopInstancesRequest();
+		request.withInstanceIds(instance_id);
+
+		ec2.stopInstances(request);
 	}
 }

@@ -43,6 +43,7 @@ public class MazeRunnerNodeManager {
 
         String workerIp = machinesIp.get(currentMachineIndex);
 
+        //FIXME node assigned to solve
         if(currentMachineIndex == machinesIp.size() -1)
             currentMachineIndex = 0;
         else
@@ -65,9 +66,11 @@ public class MazeRunnerNodeManager {
     public void registerIp(String ip){
     	if(ip == null){
     		instancesOps.getInstancesIPs();
-    		Map<String, String> ips = instancesOps.getInstancesPrivateIPs();
-    		for(String key : ips.keySet()){
-    			getMachinesIp().add(ips.get(key));
+    		Map<String, String> iprivate = instancesOps.getInstancesPrivateIPs();
+    		Map<String, String> ipublic = instancesOps.getInstancesPublicIPs();
+    		for(String key : iprivate.keySet()){
+    			getMachinesIp().add(iprivate.get(key));
+    			System.out.println("MazeRunnerNode with public ip "+ipublic.get(key) + " is up.");
     		}
     		return;
     	}
