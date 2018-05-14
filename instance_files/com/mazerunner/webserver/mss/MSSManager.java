@@ -29,22 +29,24 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
 public class MSSManager {
+	private static final String METRICS_TABLE_NAME = "MazerunnerMetrics";
 
 	private static MSSManager mssmanager = null;
 	private static AmazonDynamoDB dynamoDB;
-
 	private MSSManager() {
-		InitializeDB();
+		System.out.println("WTFF");
+		initDB();
 	}
 	
 	public static MSSManager getInstance() {
       		if(mssmanager == null) {
 	        	mssmanager = new MSSManager();
       		}
+		mssmanager.initDB();
       		return mssmanager;
 	}
 	
-	private void InitializeDB() {
+	private void initDB() {
 		ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 		    credentialsProvider.getCredentials();
@@ -60,13 +62,17 @@ public class MSSManager {
 		    .withRegion("us-east-1a")
 		    .build();
 		try {
-			String tableName = "metrics";
-
+			System.out.println("CreatingDB...");
 			// Create a table with a primary hash key named 'name', which holds a string
-		    	CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(tableName)
-				.withKeySchema(new KeySchemaElement().withAttributeName("name").withKeyType(KeyType.HASH))
-				.withAttributeDefinitions(new AttributeDefinition().withAttributeName("name").withAttributeType(ScalarAttributeType.S))
+		    	CreateTableRequest createTableRequest = new CreateTableRequest()
+				.withTableName(METRICS_TABLE_NAME)
+				.withKeySchema(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH))
+				.withAttributeDefinitions(new AttributeDefinition().withAttributeName("id").withAttributeType(ScalarAttributeType.S))
 				.withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L));
+
+			TableUtils.createTableIfNotExists(dynamoDB, createTableRequest);
+			TableUtils.waitUntilActive(dynamoDB, METRICS_TABLE_NAME);
+			System.out.println("Created!");
 		} catch (AmazonServiceException ase) {
             		System.out.println("Caught an AmazonServiceException, which means your request made it "
                     		+ "to AWS, but was rejected with an error response for some reason.");
@@ -80,6 +86,8 @@ public class MSSManager {
 			    + "a serious internal problem while trying to communicate with AWS, "
 			    + "such as not being able to access the network.");
 		    	System.out.println("Error Message: " + ace.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

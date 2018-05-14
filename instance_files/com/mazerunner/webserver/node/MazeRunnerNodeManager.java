@@ -1,5 +1,6 @@
 package com.mazerunner.webserver.node;
 
+import com.mazerunner.webserver.mss.MSSManager;
 import com.mazerunner.webserver.ws.MazeRunnerImplService;
 import com.mazerunner.webserver.ws.MazeRunnerService;
 import com.mazerunner.webserver.exceptions.NoActiveNodesException;
@@ -7,27 +8,39 @@ import com.mazerunner.webserver.exceptions.NoActiveNodesException;
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MazeRunnerNodeManager {
 
     private static MazeRunnerNodeManager nodesManager = null;
+    private static InstancesOperations instancesOps = null;
     private static List<String> machinesIp = new ArrayList<>();
+   
+    private MSSManager mssmanager;
 
     public static List<String> getMachinesIp() {
         return machinesIp;
     }
+    
     public static int currentMachineIndex = 0;
 
-    protected MazeRunnerNodeManager(){
-
+    protected MazeRunnerNodeManager(){ 
+	mssmanager = MSSManager.getInstance();	
     }
 
     public static MazeRunnerNodeManager getInstance(){
         if(nodesManager == null)
             nodesManager = new MazeRunnerNodeManager();
         return nodesManager;
+    }
+    
+    public static InstancesOperations getInstancesOperationsInstance(){
+        if(instancesOps == null)
+        	instancesOps = new InstancesOperations();
+        return instancesOps;
     }
 
     public String solveMazeOnNode(String request) throws NoActiveNodesException{
@@ -38,6 +51,7 @@ public class MazeRunnerNodeManager {
 
         String workerIp = machinesIp.get(currentMachineIndex);
 
+        //FIXME node assigned to solve
         if(currentMachineIndex == machinesIp.size() -1)
             currentMachineIndex = 0;
         else
@@ -58,6 +72,17 @@ public class MazeRunnerNodeManager {
     }
 
     public void registerIp(String ip){
+    	if(ip == null){
+    		InstancesOperations instancesOps = getInstancesOperationsInstance();
+    		instancesOps.getInstancesIPs();
+    		Map<String, String> iprivate = instancesOps.getInstancesPrivateIPs();
+    		Map<String, String> ipublic = instancesOps.getInstancesPublicIPs();
+    		for(String key : iprivate.keySet()){
+    			getMachinesIp().add(iprivate.get(key));
+    			System.out.println("MazeRunnerNode with public ip "+ipublic.get(key) + " is up.");
+    		}
+    		return;
+    	}
         for(String e : getMachinesIp()){
             if(e.equals(ip)){
                 System.out.println(e + " was already up.");
