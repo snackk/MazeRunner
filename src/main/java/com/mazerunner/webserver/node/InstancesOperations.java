@@ -1,4 +1,4 @@
-package com.mazerunner.webserver.mss;
+package com.mazerunner.webserver.node;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,8 @@ public class InstancesOperations {
 
 	private Map<String, String> instancesPrivateIPs = new HashMap<String, String>();
 	private Map<String, String> instancesPublicIPs = new HashMap<String, String>();
+	
+	public InstancesOperations(){ }
 	
 	public Map<String, String> getInstancesPrivateIPs(){
 		return this.instancesPrivateIPs;
@@ -114,7 +116,7 @@ public class InstancesOperations {
 		//FIX ME TAG
 		Tag tag = new Tag();
 		tag.setKey("Name");
-	    tag.setValue(" ");
+	    tag.setValue(instance_id); 
 
 		CreateTagsRequest tag_request = new CreateTagsRequest();
 		    tag_request.withTags(tag);
@@ -143,8 +145,9 @@ public class InstancesOperations {
         request.withInstanceIds(instance_id);
 
         RebootInstancesResult response = ec2.rebootInstances(request);
-        
-        System.out.printf("Successfully rebooted instance %s", instance_id);
+
+        if(response!=null)
+        	System.out.printf("Successfully rebooted instance %s", instance_id);
 	}
 	
 	public void startInstance(String instance_id){
