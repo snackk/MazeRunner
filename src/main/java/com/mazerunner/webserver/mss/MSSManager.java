@@ -1,5 +1,9 @@
 package com.mazerunner.webserver.mss;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 
@@ -11,6 +15,9 @@ import com.amazonaws.regions.Regions;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
@@ -26,6 +33,7 @@ import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
+import com.amazonaws.services.dynamodbv2.model.UpdateTableRequest;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
 public class MSSManager {
@@ -81,5 +89,28 @@ public class MSSManager {
 			    + "such as not being able to access the network.");
 		    	System.out.println("Error Message: " + ace.getMessage());
 		}
+	}
+	
+	public void createEntryMetric(List<String> metrics){
+
+	        final Map<String, Object> infoMap = new HashMap<String, Object>();
+	        //FIXME for index in metrics, put <metric name or request parameter, value>
+	        infoMap.put("plot", "Nothing happens at all.");
+	        infoMap.put("rating", 0);
+
+	        try {
+	            System.out.println("Adding a new item...");
+	            PutItemRequest itemRequest = new PutItemRequest();
+	            //FIXME add metrics and parameters attributes entry to DB
+				itemRequest.addItemEntry("x0", new AttributeValue("0"));
+	            PutItemResult outcome = dynamoDB.putItem(itemRequest);
+
+	            System.out.println("PutItem succeeded:\n" + outcome.toString());
+
+	        }
+	        catch (Exception e) {
+	            System.err.println("Unable to add item: " + "x0 " + "0");
+	            System.err.println(e.getMessage());
+	        }
 	}
 }
