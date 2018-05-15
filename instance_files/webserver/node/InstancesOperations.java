@@ -1,4 +1,4 @@
-package com.mazerunner.webserver.node;
+package webserver.node;
 
 import java.util.HashMap;
 import java.util.Map;

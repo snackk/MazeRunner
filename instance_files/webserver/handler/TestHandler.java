@@ -1,4 +1,4 @@
-package com.mazerunner.webserver.handler;
+package webserver.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;

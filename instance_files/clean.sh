@@ -1,2 +1,2 @@
-cd com
+cd webserver
 find -name "*.class" -delete

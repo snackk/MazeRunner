@@ -1,4 +1,4 @@
-package com.mazerunner.webserver.exceptions;
+package  webserver.exceptions;
 
 public class NoActiveNodesException extends Exception {
 

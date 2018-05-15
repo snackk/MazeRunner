@@ -1,10 +1,10 @@
-package com.mazerunner.webserver;
+package webserver;
 
-import com.mazerunner.webserver.mss.MSSManager;
-import com.mazerunner.webserver.handler.RegisterIpHandler;
-import com.mazerunner.webserver.handler.RequestHandler;
-import com.mazerunner.webserver.handler.TestHandler;
-import com.mazerunner.webserver.node.MazeRunnerNodeManager;
+import webserver.mss.MSSManager;
+import webserver.handler.RegisterIpHandler;
+import webserver.handler.RequestHandler;
+import webserver.handler.TestHandler;
+import webserver.node.MazeRunnerNodeManager;
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;

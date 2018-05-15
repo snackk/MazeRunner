@@ -1,8 +1,11 @@
-package com.mazerunner.webserver.mss;
+package webserver.mss;
 
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+
+import Jama.Matrix;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 
@@ -144,19 +147,19 @@ public class MSSManager {
 	public LinearRegression parseScanResult(ScanResult scanResult) {
 		
 		LinearRegression lr = new LinearRegression();	
-		int[][] features = new int[scanResult.getCount()][Features.values().length]; 
+		double[][] features = new double[scanResult.getCount()][Features.values().length]; 
 
-		int[] target = new int[scanResult.getCount()];
+		double[] target = new double[scanResult.getCount()];
 
 		int countMap, countEnum;
 		countMap = countEnum = 0;
 
 		for (Map<String, AttributeValue> map : scanResult.getItems()) {
 			for (Features feature : Features.values()){
-				features[countMap][countEnum] = Integer.parseInt(map.get(feature.toString()).getS());
-				target[countMap] = Integer.parseInt(map.get(LINEAR_REGRESSION_TARGET).getS());
+				features[countMap][countEnum] = Double.parseDouble(map.get(feature.toString()).getS());
 				countEnum++;
 			}		
+			target[countMap] = Double.parseDouble(map.get(LINEAR_REGRESSION_TARGET).getS());
 			countEnum = 0;				
 			countMap ++;
 		}
@@ -164,8 +167,6 @@ public class MSSManager {
 		lr.setFeatures(features);
 		lr.setTarget(target);	
 		
-		//System.out.println(scanResult.getItems().get(0));
-		//System.out.println(lr);
 
 		return lr;
 	}	

@@ -1,5 +1,5 @@
 
-package com.mazerunner.webserver.ws;
+package webserver.ws;
 
 import java.net.MalformedURLException;
 import java.net.URL;

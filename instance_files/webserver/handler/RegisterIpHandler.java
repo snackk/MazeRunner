@@ -1,9 +1,9 @@
-package com.mazerunner.webserver.handler;
+package webserver.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.mazerunner.webserver.node.MazeRunnerNodeManager;
+import webserver.node.MazeRunnerNodeManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 

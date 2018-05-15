@@ -1,9 +1,9 @@
-package com.mazerunner.webserver.node;
+package webserver.node;
 
-import com.mazerunner.webserver.mss.MSSManager;
-import com.mazerunner.webserver.ws.MazeRunnerImplService;
-import com.mazerunner.webserver.ws.MazeRunnerService;
-import com.mazerunner.webserver.exceptions.NoActiveNodesException;
+import webserver.mss.MSSManager;
+import webserver.ws.MazeRunnerImplService;
+import webserver.ws.MazeRunnerService;
+import webserver.exceptions.NoActiveNodesException;
 
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
