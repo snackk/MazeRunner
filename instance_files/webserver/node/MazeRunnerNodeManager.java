@@ -93,4 +93,10 @@ public class MazeRunnerNodeManager {
 
         System.out.println(ip + " is up.");
     }
+
+    public void updateNodeInstances(List<String> downNodes) {
+        for(String downNode : downNodes) {
+            machinesIp.remove(downNode);
+        }
+    }
 }

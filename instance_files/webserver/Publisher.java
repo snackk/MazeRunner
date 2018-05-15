@@ -4,10 +4,12 @@ import webserver.mss.MSSManager;
 import webserver.handler.RegisterIpHandler;
 import webserver.handler.RequestHandler;
 import webserver.handler.TestHandler;
+import webserver.node.HealthCheck;
 import webserver.node.MazeRunnerNodeManager;
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;
+import java.util.Timer;
 import java.util.concurrent.Executors;
 
 public class Publisher {
@@ -32,5 +34,9 @@ public class Publisher {
         System.out.println("Publishing on: http://localhost:" + portNumber + "/test.html");
 	    server.setExecutor(Executors.newFixedThreadPool(threadsNumber));
         server.start();
+
+        /*Perform health checks each minute*/
+        Timer t1 = new Timer();
+        t1.schedule(new HealthCheck(), 0,60000);
     }
 }
