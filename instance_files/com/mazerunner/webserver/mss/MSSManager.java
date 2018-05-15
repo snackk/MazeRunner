@@ -1,5 +1,8 @@
 package com.mazerunner.webserver.mss;
 
+import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 
@@ -28,13 +31,27 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
+
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+
 public class MSSManager {
 	private static final String METRICS_TABLE_NAME = "MazerunnerMetrics";
+	private static final String LINEAR_REGRESSION_TARGET = "bbl";
 
 	private static MSSManager mssmanager = null;
 	private static AmazonDynamoDB dynamoDB;
+
+	private enum Features {x0, y0, x1, y1, v}
+
 	private MSSManager() {
-		System.out.println("WTFF");
 		initDB();
 	}
 	
@@ -42,7 +59,6 @@ public class MSSManager {
       		if(mssmanager == null) {
 	        	mssmanager = new MSSManager();
       		}
-		mssmanager.initDB();
       		return mssmanager;
 	}
 	
@@ -62,17 +78,23 @@ public class MSSManager {
 		    .withRegion("us-east-1a")
 		    .build();
 		try {
-			System.out.println("CreatingDB...");
-			// Create a table with a primary hash key named 'name', which holds a string
-		    	CreateTableRequest createTableRequest = new CreateTableRequest()
+			System.out.println("Initializing DynamoDB...");
+		    	
+			CreateTableRequest createTableRequest = new CreateTableRequest()
 				.withTableName(METRICS_TABLE_NAME)
 				.withKeySchema(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH))
 				.withAttributeDefinitions(new AttributeDefinition().withAttributeName("id").withAttributeType(ScalarAttributeType.S))
 				.withProvisionedThroughput(new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L));
-
+	
 			TableUtils.createTableIfNotExists(dynamoDB, createTableRequest);
 			TableUtils.waitUntilActive(dynamoDB, METRICS_TABLE_NAME);
-			System.out.println("Created!");
+
+			System.out.println("DynamoDB is ready!");
+
+			/*DELETEME: TESTING PURPOSES*/
+			ScanResult sr = fetchDB("bfs","Maze50.maze");
+			LinearRegression lr = parseScanResult(sr);
+			/*END OF DELETEME*/
 		} catch (AmazonServiceException ase) {
             		System.out.println("Caught an AmazonServiceException, which means your request made it "
                     		+ "to AWS, but was rejected with an error response for some reason.");
@@ -90,4 +112,62 @@ public class MSSManager {
 			e.printStackTrace();
 		}
 	}
+
+	/**/
+	public ScanResult fetchDB(String strategy, String mazefile){
+		ScanResult scanResult = null;
+		try {
+
+			HashMap<String, Condition> scanFilter = new HashMap<String, Condition>();
+			
+			Condition strategyCondition = new Condition()
+				.withComparisonOperator(ComparisonOperator.EQ.toString())
+				.withAttributeValueList(new AttributeValue().withS(strategy));			
+			Condition mazefileCondition = new Condition()
+				.withComparisonOperator(ComparisonOperator.EQ.toString())
+				.withAttributeValueList(new AttributeValue().withS(mazefile));
+		
+			scanFilter.put("s", strategyCondition);
+			scanFilter.put("m", mazefileCondition);
+
+			ScanRequest scanRequest = new ScanRequest(METRICS_TABLE_NAME).withScanFilter(scanFilter);
+			scanResult = dynamoDB.scan(scanRequest);
+			System.out.println("Result :" + scanResult);
+
+		} catch (Exception e) {
+		    System.err.println("Unable to scan the table: " + e.getMessage());
+		}
+
+		return scanResult;			
+	}
+	/*Transforms a ScanResult into a LinearRegression object*/
+	public LinearRegression parseScanResult(ScanResult scanResult) {
+		
+		LinearRegression lr = new LinearRegression();	
+		int[][] features = new int[scanResult.getCount()][Features.values().length]; 
+
+		int[] target = new int[scanResult.getCount()];
+
+		int countMap, countEnum;
+		countMap = countEnum = 0;
+
+		for (Map<String, AttributeValue> map : scanResult.getItems()) {
+			for (Features feature : Features.values()){
+				features[countMap][countEnum] = Integer.parseInt(map.get(feature.toString()).getS());
+				target[countMap] = Integer.parseInt(map.get(LINEAR_REGRESSION_TARGET).getS());
+				countEnum++;
+			}		
+			countEnum = 0;				
+			countMap ++;
+		}
+	
+		lr.setFeatures(features);
+		lr.setTarget(target);	
+		
+		//System.out.println(scanResult.getItems().get(0));
+		//System.out.println(lr);
+
+		return lr;
+	}	
+		
 }
