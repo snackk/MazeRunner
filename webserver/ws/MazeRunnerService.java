@@ -15,7 +15,7 @@ import javax.xml.ws.Action;
  * Generated source version: 2.2
  * 
  */
-@WebService(name = "MazeRunnerService", targetNamespace = "http://ws.node.mazerunner.com/")
+@WebService(name = "MazeRunnerService", targetNamespace = "http://ws.mazerunnernode/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public interface MazeRunnerService {
 
@@ -28,7 +28,7 @@ public interface MazeRunnerService {
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://ws.node.mazerunner.com/MazeRunnerService/solveMazeRequest", output = "http://ws.node.mazerunner.com/MazeRunnerService/solveMazeResponse")
+    @Action(input = "http://ws.mazerunnernode/MazeRunnerService/solveMazeRequest", output = "http://ws.mazerunnernode/MazeRunnerService/solveMazeResponse")
     public String solveMaze(
         @WebParam(name = "arg0", partName = "arg0")
         String arg0);
