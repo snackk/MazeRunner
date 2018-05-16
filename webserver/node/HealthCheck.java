@@ -1,6 +1,7 @@
 package webserver.node;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,14 +18,20 @@ public class HealthCheck extends TimerTask {
         List<String> ipsToDelete = new ArrayList<>();
 
         for(String ip : mazeRunnerNodeManager.getMachinesIp()) {
+            System.out.println("Health check on node: " + ip);
             URL newEndpoint = null;
+            HttpURLConnection conn = null;
             try {
                 newEndpoint = new URL("http://" + ip + ":8888/MazeRunnerNodeWS?wsdl");
-                newEndpoint.openConnection();
+                conn = (HttpURLConnection) newEndpoint.openConnection();
+                conn.setRequestMethod("HEAD");
+                conn.getInputStream();
+                System.out.println(conn.getResponseCode());
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException ex) {  /*Node is down*/
+                System.out.println("Node with ip: " + ip + " is down.");
                 ipsToDelete.add(ip);
             }
         }
