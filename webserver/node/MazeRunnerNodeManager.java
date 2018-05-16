@@ -66,7 +66,7 @@ public class MazeRunnerNodeManager {
         }
         System.out.println("Sending request " + request + " to " + workerIp);
 
-        QName qname = new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplService");
+        QName qname = new QName("http://ws.mazerunnernode/", "MazeRunnerImplService");
         MazeRunnerService mazeRunnerService = new MazeRunnerImplService(newEndpoint, qname).getMazeRunnerImplPort();
         return mazeRunnerService.solveMaze(request);
     }

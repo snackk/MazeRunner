@@ -17,14 +17,14 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "MazeRunnerImplService", targetNamespace = "http://ws.node.mazerunner.com/", wsdlLocation = "http://localhost:8888/MazeRunnerNodeWS?wsdl")
+@WebServiceClient(name = "MazeRunnerImplService", targetNamespace = "http://ws.mazerunnernode/", wsdlLocation = "http://localhost:8888/MazeRunnerNodeWS?wsdl")
 public class MazeRunnerImplService
     extends Service
 {
 
     private final static URL MAZERUNNERIMPLSERVICE_WSDL_LOCATION;
     private final static WebServiceException MAZERUNNERIMPLSERVICE_EXCEPTION;
-    private final static QName MAZERUNNERIMPLSERVICE_QNAME = new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplService");
+    private final static QName MAZERUNNERIMPLSERVICE_QNAME = new QName("http://ws.mazerunnernode/", "MazeRunnerImplService");
 
     static {
         URL url = null;
@@ -69,7 +69,7 @@ public class MazeRunnerImplService
      */
     @WebEndpoint(name = "MazeRunnerImplPort")
     public MazeRunnerService getMazeRunnerImplPort() {
-        return super.getPort(new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplPort"), MazeRunnerService.class);
+        return super.getPort(new QName("http://ws.mazerunnernode/", "MazeRunnerImplPort"), MazeRunnerService.class);
     }
 
     /**
@@ -81,7 +81,7 @@ public class MazeRunnerImplService
      */
     @WebEndpoint(name = "MazeRunnerImplPort")
     public MazeRunnerService getMazeRunnerImplPort(WebServiceFeature... features) {
-        return super.getPort(new QName("http://ws.node.mazerunner.com/", "MazeRunnerImplPort"), MazeRunnerService.class, features);
+        return super.getPort(new QName("http://ws.mazerunnernode/", "MazeRunnerImplPort"), MazeRunnerService.class, features);
     }
 
     private static URL __getWsdlLocation() {
