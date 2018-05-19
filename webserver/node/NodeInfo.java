@@ -10,7 +10,7 @@ public class NodeInfo {
     private String lastRequest = "";
 
     /*<BasicBlock, CpuUsage>*/
-    private Map<Long, Long> cpuUsageByBasicBlocks = new HashMap<>();
+    private Map<Double, Long> cpuUsageByBasicBlocks = new HashMap<>();
 
     public NodeInfo() {
 
@@ -32,7 +32,7 @@ public class NodeInfo {
         this.lastRequest = lastRequest;
     }
 
-    public Map<Long, Long> getCpuUsageByBasicBlocks() {
+    public Map<Double, Long> getCpuUsageByBasicBlocks() {
         return cpuUsageByBasicBlocks;
     }
 }
