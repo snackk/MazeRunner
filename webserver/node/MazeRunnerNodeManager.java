@@ -50,7 +50,18 @@ public class MazeRunnerNodeManager {
 
     public String solveMazeOnNode(String request) throws MazeRunnerException {
 
-        String workerIp = loadBalanceRequest(request);
+        /*If there aren't any Nodes registered*/
+        if(getNodesByIp().size() == 0){
+            throw new NoActiveNodesException();
+        }
+
+        String workerIp = "";
+        try {
+            workerIp = loadBalanceRequest(request);
+
+        } catch (NotEnoughNodesException e) {
+            /*The AutoScaler should kick in here to start a new instance*/
+        }
 
         URL newEndpoint = null;
         try {
@@ -58,19 +69,19 @@ public class MazeRunnerNodeManager {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
         System.out.println("Sending request " + request + " to " + workerIp);
 
         QName qname = new QName("http://ws.mazerunnernode/", "MazeRunnerImplService");
         MazeRunnerService mazeRunnerService = new MazeRunnerImplService(newEndpoint, qname).getMazeRunnerImplPort();
-        return mazeRunnerService.solveMaze(request);
+
+        String toReturn =  mazeRunnerService.solveMaze(request);
+
+        /*The request has already been processed here.*/
+        return toReturn;
     }
 
-    public String loadBalanceRequest(String request) throws MazeRunnerException {
-
-        /*If there aren't any Nodes registered*/
-        if(getNodesByIp().size() == 0){
-            throw new NoActiveNodesException();
-        }
+    public String loadBalanceRequest(String request) throws NotEnoughNodesException {
 
         /*Estimate using LinearRegression the Basic Blocks of the Request*/
         Long requestBasicBlocksEstimation = 1L;
@@ -81,12 +92,27 @@ public class MazeRunnerNodeManager {
         /*Iterate Nodes and estimate the CPU cost of the request*/
         NodeInfo nodeInfoToRequest = null;
         for(NodeInfo nodeInfo : nodesByIp.values()) {
-            Long estimateCpuUsage = (requestBasicBlocksEstimation * nodeInfo.getCpuLoad()) / nodeInfo.getEstimateBasicBlocks();
+
+            /*Choose the closest Basic Block to Our Request*/
+            Long basicBlock = 0L;
+            Long deviation = null;
+            for(Long nodeBasicBlock : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
+                Long temp = Math.abs(requestBasicBlocksEstimation - nodeBasicBlock);
+                if(deviation == null || temp < deviation) {
+                    deviation = temp;
+                    basicBlock = nodeBasicBlock;
+                }
+            }
+
+            /*Compute what could be the Cpu usage of our Request*/
+            Long cpuUsageOfBasicBlock = nodeInfo.getCpuUsageByBasicBlocks().get(basicBlock);
+            Long estimateCpuUsage = (requestBasicBlocksEstimation * cpuUsageOfBasicBlock) / basicBlock;
 
             if((nodeInfo.getCpuLoad() + estimateCpuUsage) <= nodeMaxLoad) {
-                nodeInfo.setEstimateBasicBlocks(requestBasicBlocksEstimation);
+                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1L);
                 nodeInfo.setLastRequest(request);
                 nodeInfoToRequest = nodeInfo;
+                break;
             }
         }
 

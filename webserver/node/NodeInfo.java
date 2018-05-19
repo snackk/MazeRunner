@@ -1,12 +1,16 @@
 package webserver.node;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NodeInfo {
 
     private int cpuLoad = 0;
 
     private String lastRequest = "";
 
-    private Long estimateBasicBlocks = 0L;
+    /*<BasicBlock, CpuUsage>*/
+    private Map<Long, Long> cpuUsageByBasicBlocks = new HashMap<>();
 
     public NodeInfo() {
 
@@ -28,11 +32,7 @@ public class NodeInfo {
         this.lastRequest = lastRequest;
     }
 
-    public Long getEstimateBasicBlocks() {
-        return estimateBasicBlocks;
-    }
-
-    public void setEstimateBasicBlocks(Long estimateBasicBlocks) {
-        this.estimateBasicBlocks = estimateBasicBlocks;
+    public Map<Long, Long> getCpuUsageByBasicBlocks() {
+        return cpuUsageByBasicBlocks;
     }
 }

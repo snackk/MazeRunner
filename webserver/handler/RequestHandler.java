@@ -11,21 +11,20 @@ public class RequestHandler implements HttpHandler {
     private MazeRunnerNodeManager mazeRunnerNodeManager;
 
     @Override
-    public void handle(HttpExchange t) throws IOException {
+    public void handle(HttpExchange t) {
         mazeRunnerNodeManager = MazeRunnerNodeManager.getInstance();
         String query = t.getRequestURI().getQuery();
 
-        //System.out.println("Request to solve maze with parameters: " + query);
         try{
-                    String response = mazeRunnerNodeManager.solveMazeOnNode(query);
+            String response = mazeRunnerNodeManager.solveMazeOnNode(query);
 
-        t.sendResponseHeaders(200, response.length());
-        OutputStream os = t.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
