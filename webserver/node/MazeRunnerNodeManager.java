@@ -108,6 +108,9 @@ public class MazeRunnerNodeManager {
 
             /*If Node got 0 Basic Blocks OR Estimation fails*/
             if(nodeInfo.getCpuUsageByBasicBlocks().keySet().isEmpty() || requestBasicBlocksEstimation == -1) {
+                System.out.println("Reported: " + nodeInfo.getCpuUsageByBasicBlocks().keySet().size());
+                System.out.println(nodeInfo);
+
                 nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1L);
                 nodeInfo.setLastRequest(request);
                 nodeInfoToRequest = nodeInfo;
@@ -145,12 +148,10 @@ public class MazeRunnerNodeManager {
         /*Getting the actual IP for the Node*/
         String nodeToProcessRequest = "";
         for(String node : nodesByIp.keySet()) {
-            nodeToProcessRequest = node;
-            break;
-            /*Mock because havent got real numbers to predict*/
-//            if(nodesByIp.get(node).equals(nodeInfoToRequest)) {
-//                nodeToProcessRequest = node;
-//            }
+            if(nodesByIp.get(node).equals(nodeInfoToRequest)) {
+                nodeToProcessRequest = node;
+                break;
+            }
         }
 
         return nodeToProcessRequest;
