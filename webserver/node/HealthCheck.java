@@ -17,7 +17,7 @@ public class HealthCheck extends TimerTask {
 
         List<String> ipsToDelete = new ArrayList<>();
 
-        for(String ip : mazeRunnerNodeManager.getMachinesIp()) {
+        for(String ip : mazeRunnerNodeManager.getNodesByIp().keySet()) {
             System.out.println("Health check on node: " + ip);
             URL newEndpoint = null;
             HttpURLConnection conn = null;
