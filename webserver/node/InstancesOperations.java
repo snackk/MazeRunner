@@ -1,12 +1,19 @@
 package webserver.node;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient;
+import com.amazonaws.services.cloudwatch.model.Datapoint;
+import com.amazonaws.services.cloudwatch.model.Dimension;
+import com.amazonaws.services.cloudwatch.model.GetMetricStatisticsRequest;
+import com.amazonaws.services.cloudwatch.model.GetMetricStatisticsResult;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
@@ -181,12 +188,35 @@ public class InstancesOperations {
 			    e);
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-		
+
 		StopInstancesRequest request = new StopInstancesRequest();
 		request.withInstanceIds(instance_id);
 
 		ec2.stopInstances(request);
 		
 		 System.out.printf("Successfully stop instance %s", instance_id);
+	}
+
+	public double getInstanceAverageLoad(AmazonCloudWatchClient cloudWatchClient, String instanceId) {
+
+		long offsetInMilliseconds = 1000 * 60 * 60;
+		GetMetricStatisticsRequest request = new GetMetricStatisticsRequest()
+				.withStartTime(new Date(new Date().getTime() - offsetInMilliseconds))
+				.withNamespace("AWS/EC2")
+				.withPeriod(60 * 60)
+				.withDimensions(new Dimension().withName("InstanceId").withValue(instanceId))
+				.withMetricName("CPUUtilization")
+				.withStatistics("Average", "Maximum")
+				.withEndTime(new Date());
+		GetMetricStatisticsResult getMetricStatisticsResult = cloudWatchClient.getMetricStatistics(request);
+
+		double avgCPUUtilization = 0;
+		List dataPoint = getMetricStatisticsResult.getDatapoints();
+		for (Object aDataPoint : dataPoint) {
+			Datapoint dp = (Datapoint) aDataPoint;
+			avgCPUUtilization = dp.getAverage();
+		}
+
+		return avgCPUUtilization;
 	}
 }
