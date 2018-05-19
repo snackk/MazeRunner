@@ -36,5 +36,29 @@ public class HealthCheck extends TimerTask {
             }
         }
         mazeRunnerNodeManager.updateNodeInstances(ipsToDelete);
+
+        measureCpuUsage();
+    }
+
+    public void measureCpuUsage() {
+        InstancesOperations instancesOperations = MazeRunnerNodeManager.getInstancesOperationsInstance();
+
+        for(String ip : mazeRunnerNodeManager.getNodesByIp().keySet()) {
+            NodeInfo nodeInfo = mazeRunnerNodeManager.getNodesByIp().get(ip);
+            double cpuUsage = instancesOperations.getInstanceAverageLoad(nodeInfo.getInstanceId());
+
+            nodeInfo.setCpuLoad(cpuUsage);
+            System.out.println("CPU usage: " + cpuUsage);
+
+            double parcialCpuUsage = 0D;
+            for(double basicBlock : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
+                double cpuPerBB = nodeInfo.getCpuUsageByBasicBlocks().get(basicBlock);
+                if(cpuPerBB != -1D) {
+                    parcialCpuUsage += cpuPerBB;
+                } else {
+                    nodeInfo.getCpuUsageByBasicBlocks().put(basicBlock, (cpuUsage - parcialCpuUsage));
+                }
+            }
+        }
     }
 }

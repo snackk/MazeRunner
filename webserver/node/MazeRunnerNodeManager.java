@@ -29,7 +29,7 @@ public class MazeRunnerNodeManager {
 
     /*Nodes*/
     private static Map<String, NodeInfo> nodesByIp = new HashMap<>();
-    private static Long nodeMaxLoad = 90L;
+    private static double nodeMaxLoad = 90D;
 
     /*Linear Regression*/
     private enum paramsType {x0, y0, x1, y1, v, s, m}
@@ -39,7 +39,7 @@ public class MazeRunnerNodeManager {
     private MSSManager mssmanager;
 
     protected MazeRunnerNodeManager(){ 
-	mssmanager = MSSManager.getInstance();	
+	    mssmanager = MSSManager.getInstance();
     }
 
     public static MazeRunnerNodeManager getInstance(){
@@ -111,7 +111,7 @@ public class MazeRunnerNodeManager {
                 System.out.println("Reported: " + nodeInfo.getCpuUsageByBasicBlocks().keySet().size());
                 System.out.println(nodeInfo);
 
-                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1L);
+                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1D);
                 nodeInfo.setLastRequest(request);
                 nodeInfoToRequest = nodeInfo;
                 break;
@@ -129,11 +129,11 @@ public class MazeRunnerNodeManager {
             }
 
             /*Compute what could be the Cpu usage of our Request*/
-            Long cpuUsageOfBasicBlock = nodeInfo.getCpuUsageByBasicBlocks().get(basicBlock);
-            Double estimateCpuUsage = (requestBasicBlocksEstimation * cpuUsageOfBasicBlock) / basicBlock;
+            double cpuUsageOfBasicBlock = nodeInfo.getCpuUsageByBasicBlocks().get(basicBlock);
+            double estimateCpuUsage = (requestBasicBlocksEstimation * cpuUsageOfBasicBlock) / basicBlock;
 
             if((nodeInfo.getCpuLoad() + estimateCpuUsage) <= nodeMaxLoad) {
-                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1L);
+                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1D);
                 nodeInfo.setLastRequest(request);
                 nodeInfoToRequest = nodeInfo;
                 break;
@@ -161,11 +161,11 @@ public class MazeRunnerNodeManager {
     	if(ip == null){
     		InstancesOperations instancesOps = getInstancesOperationsInstance();
     		instancesOps.getInstancesIPs();
-    		Map<String, String> iprivate = instancesOps.getInstancesPrivateIPs();
-    		Map<String, String> ipublic = instancesOps.getInstancesPublicIPs();
-    		for(String key : iprivate.keySet()){
-    			nodesByIp.put(iprivate.get(key), new NodeInfo());
-    			System.out.println("MazeRunnerNode with public ip " + ipublic.get(key) + " is up.");
+    		Map<String, String> privateIps = instancesOps.getInstancesPrivateIPs();
+    		Map<String, String> publicIps = instancesOps.getInstancesPublicIPs();
+    		for(String instanceId : privateIps.keySet()){
+    			nodesByIp.put(privateIps.get(instanceId), new NodeInfo(instanceId));
+    			System.out.println("MazeRunnerNode with public ip " + publicIps.get(instanceId) + " is up.");
     		}
     		return;
     	}
@@ -175,7 +175,7 @@ public class MazeRunnerNodeManager {
                 return;
             }
         }
-        nodesByIp.put(ip, new NodeInfo());
+        nodesByIp.put(ip, new NodeInfo(""));
 
         System.out.println(ip + " is up.");
     }

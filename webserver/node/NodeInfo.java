@@ -5,22 +5,24 @@ import java.util.Map;
 
 public class NodeInfo {
 
-    private int cpuLoad = 0;
+    private double cpuLoad = 0;
 
     private String lastRequest = "";
 
     /*<BasicBlock, CpuUsage>*/
-    private Map<Double, Long> cpuUsageByBasicBlocks = new HashMap<>();
+    private Map<Double, Double> cpuUsageByBasicBlocks = new HashMap<>();
 
-    public NodeInfo() {
+    private String instanceId;
 
+    public NodeInfo(String instanceId) {
+        this.instanceId = instanceId;
     }
 
-    public int getCpuLoad() {
+    public double getCpuLoad() {
         return cpuLoad;
     }
 
-    public void setCpuLoad(int cpuLoad) {
+    public void setCpuLoad(double cpuLoad) {
         this.cpuLoad = cpuLoad;
     }
 
@@ -32,7 +34,11 @@ public class NodeInfo {
         this.lastRequest = lastRequest;
     }
 
-    public Map<Double, Long> getCpuUsageByBasicBlocks() {
+    public Map<Double, Double> getCpuUsageByBasicBlocks() {
         return cpuUsageByBasicBlocks;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
     }
 }

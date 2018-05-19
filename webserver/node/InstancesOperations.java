@@ -197,7 +197,18 @@ public class InstancesOperations {
 		 System.out.printf("Successfully stop instance %s", instance_id);
 	}
 
-	public double getInstanceAverageLoad(AmazonCloudWatchClient cloudWatchClient, String instanceId) {
+	public double getInstanceAverageLoad(String instanceId) {
+		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+		try {
+			credentialsProvider.getCredentials();
+		} catch (Exception e) {
+			throw new AmazonClientException(
+					"Cannot load the credentials from the credential profiles file. " +
+							"Please make sure that your credentials file is at the correct " +
+							"location (~/.aws/credentials), and is in valid format.",
+					e);
+		}
+		AmazonCloudWatchClient cloudWatchClient = new AmazonCloudWatchClient(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials()));
 
 		long offsetInMilliseconds = 1000 * 60 * 60;
 		GetMetricStatisticsRequest request = new GetMetricStatisticsRequest()
