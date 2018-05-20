@@ -107,7 +107,7 @@ public class InstancesOperations {
             System.out.println("");
 	}
 	
-	public void createInstance(){
+	public String createInstance(){
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 		    credentialsProvider.getCredentials();
@@ -151,7 +151,9 @@ public class InstancesOperations {
 		        "Successfully created EC2 instance %s based on AMI %s",
 		        instance_id, node_AMI_ID);
 		
-		startInstance(instance_id);		
+		startInstance(instance_id);
+		
+		return instance_id;
 	}
 	
 	public void rebootInstance(String instance_id){
