@@ -26,7 +26,7 @@ public class HealthCheck extends TimerTask {
                 conn = (HttpURLConnection) newEndpoint.openConnection();
                 conn.setRequestMethod("HEAD");
                 conn.getInputStream();
-                System.out.println(conn.getResponseCode());
+                System.out.println(conn.getResponseCode() == 200 ? "Node's OK" : "Node's NOK");
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

@@ -26,6 +26,6 @@ $ mvn exec:java
 ### Making requests
 
 Open a browser and shoot this on the url:
-http://localhost:8000/mzrun.html?m=Maze100&x0=3&y0=9&x1=78&y1=89&v=50&s=astar
+http://ec2-18-206-71-136.compute-1.amazonaws.com:8000/mzrun.html?m=Maze100&x0=3&y0=9&x1=78&y1=89&v=50&s=astar
 
   Written by Diogo Santos.

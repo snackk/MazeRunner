@@ -158,26 +158,15 @@ public class MazeRunnerNodeManager {
     }
 
     public void registerIp(String ip){
-    	if(ip == null){
-    		InstancesOperations instancesOps = getInstancesOperationsInstance();
-    		instancesOps.getInstancesIPs();
-    		Map<String, String> privateIps = instancesOps.getInstancesPrivateIPs();
-    		Map<String, String> publicIps = instancesOps.getInstancesPublicIPs();
-    		for(String instanceId : privateIps.keySet()){
-    			nodesByIp.put(privateIps.get(instanceId), new NodeInfo(instanceId));
-    			System.out.println("MazeRunnerNode with public ip " + publicIps.get(instanceId) + " is up.");
-    		}
-    		return;
-    	}
-        for(String e : nodesByIp.keySet()){
-            if(e.equals(ip)){
-                System.out.println(e + " was already up.");
-                return;
-            }
-        }
-        nodesByIp.put(ip, new NodeInfo(""));
+        InstancesOperations instancesOps = getInstancesOperationsInstance();
+        instancesOps.getInstancesIPs();
+        Map<String, String> privateIps = instancesOps.getInstancesPrivateIPs();
 
-        System.out.println(ip + " is up.");
+        for(String instanceId : privateIps.keySet()){
+            nodesByIp.put(privateIps.get(instanceId), new NodeInfo(instanceId));
+            System.out.println("MazeRunnerNode with public ip " + privateIps.get(instanceId) + " is up.");
+        }
+        return;
     }
 
     public void updateNodeInstances(List<String> downNodes) {
