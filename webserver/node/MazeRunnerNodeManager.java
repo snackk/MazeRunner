@@ -71,6 +71,8 @@ public class MazeRunnerNodeManager {
 
         } catch (NotEnoughNodesException e) {
             /*The AutoScaler should kick in here to start a new instance*/
+        	InstanceOperations instanceOps = InstanceOperations.getInstance();
+        	instanceOps.createInstance();
         }
 
         URL newEndpoint = null;

@@ -35,6 +35,13 @@ public class InstancesOperations {
 	private Map<String, String> instancesPrivateIPs = new HashMap<String, String>();
 	private Map<String, String> instancesPublicIPs = new HashMap<String, String>();
 	
+	private static final String node_AMI_ID = "ami-3841df47";
+	private static final String security_group_ID = "sg-1e70ff57";
+	private static final String subnet_ID = "subnet-b9555edd";
+	private static final String instance_TYPE = InstanceType.T2Micro;
+	private static final String keyName = "CNV-aws";
+
+	
 	public InstancesOperations(){ }
 	
 	public Map<String, String> getInstancesPrivateIPs(){
@@ -111,12 +118,16 @@ public class InstancesOperations {
 			    "location (~/.aws/credentials), and is in valid format.",
 			    e);
 		}
-		String ami_id = ""; //FIXME
 		RunInstancesRequest run_request = new RunInstancesRequest();
-		run_request.setImageId(ami_id);
-		run_request.setInstanceType(InstanceType.T1Micro);
-		run_request.setMaxCount(1);
-		run_request.setMinCount(1);
+		run_request.withImageId(node_AMI_ID);
+		run_request.withInstanceType(instance_TYPE);
+		run_request.withMaxCount(1);
+		run_request.withMinCount(1);
+		run_request.withSubnetId(subnet_ID);
+		run_request.withSecurityGroups(security_group_ID);
+		run_request.withMonitoring(1);
+		run_request.withRequestCredentialsProvider(credentialsProvider);
+		run_request.withKeyName(keyName);
 		
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
 
@@ -126,17 +137,21 @@ public class InstancesOperations {
 
 		//FIX ME TAG
 		Tag tag = new Tag();
-		tag.setKey("Name");
-	    tag.setValue(instance_id); 
+		tag.withKey("Name");
+	    tag.withValue(instance_id); 
 
 		CreateTagsRequest tag_request = new CreateTagsRequest();
 		    tag_request.withTags(tag);
 
 		ec2.createTags(tag_request);
-		startInstance(instance_id);
-	    System.out.printf(
-	        "Successfully started EC2 instance %s based on AMI %s",
-	        instance_id, ami_id);		
+		
+		CreateTagsResult tag_response = ec2.createTags(tag_request);
+		
+		System.out.printf(
+		        "Successfully created EC2 instance %s based on AMI %s",
+		        instance_id, node_AMI_ID);
+		
+		startInstance(instance_id);		
 	}
 	
 	public void rebootInstance(String instance_id){
@@ -161,7 +176,7 @@ public class InstancesOperations {
         	System.out.printf("Successfully rebooted instance %s", instance_id);
 	}
 	
-	public void startInstance(String instance_id){
+	public void startInstance(String instance_id) {
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 		    credentialsProvider.getCredentials();
@@ -174,13 +189,32 @@ public class InstancesOperations {
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
 
-		StartInstancesRequest request = new StartInstancesRequest();
-		request.withInstanceIds(instance_id);
+        DryRunSupportedRequest<StartInstancesRequest> dry_request =
+            () -> {
+            StartInstancesRequest request = new StartInstancesRequest()
+                .withInstanceIds(instance_id);
 
-		ec2.startInstances(request);
-	}
+            return request.getDryRunRequest();
+        };
+
+        DryRunResult dry_response = ec2.dryRun(dry_request);
+
+        if(!dry_response.isSuccessful()) {
+            System.out.printf(
+                "Failed dry run to start instance %s", instance_id);
+
+            throw dry_response.getDryRunResponse();
+        }
+
+        StartInstancesRequest request = new StartInstancesRequest()
+            .withInstanceIds(instance_id);
+
+        ec2.startInstances(request);
+
+        System.out.printf("Successfully started instance %s", instance_id);
+    }
 	
-	public void stopInstance(String instance_id){
+	public void stopInstance(String instance_id) {
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 		    credentialsProvider.getCredentials();
@@ -193,12 +227,28 @@ public class InstancesOperations {
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
 
-		StopInstancesRequest request = new StopInstancesRequest();
-		request.withInstanceIds(instance_id);
+        DryRunSupportedRequest<StopInstancesRequest> dry_request =
+            () -> {
+            StopInstancesRequest request = new StopInstancesRequest()
+                .withInstanceIds(instance_id);
 
-		ec2.stopInstances(request);
-		
-		 System.out.printf("Successfully stop instance %s", instance_id);
+            return request.getDryRunRequest();
+        };
+
+        DryRunResult dry_response = ec2.dryRun(dry_request);
+
+        if(!dry_response.isSuccessful()) {
+            System.out.printf(
+                "Failed dry run to stop instance %s", instance_id);
+            throw dry_response.getDryRunResponse();
+        }
+
+        StopInstancesRequest request = new StopInstancesRequest()
+            .withInstanceIds(instance_id);
+
+        ec2.stopInstances(request);
+
+        System.out.printf("Successfully stop instance %s", instance_id);
 	}
 
 	public double getInstanceAverageLoad(String instanceId) {
