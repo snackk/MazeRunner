@@ -65,9 +65,13 @@ public class InstancesOperations {
 
 		    for(Reservation reservation : response.getReservations()) {
 		        for(Instance instance : reservation.getInstances()) {
-		            listInstance(instance);
-		            instancesPrivateIPs.put(instance.getInstanceId(), instance.getPrivateIpAddress());
-		            instancesPublicIPs.put(instance.getInstanceId(), instance.getPublicIpAddress());
+		        	//TODO Hackish way of not registering LoadBalancer.
+					//Replace it by a smarter way
+		        	if(!instance.getInstanceId().equals("i-0883300a5cd3d612f")) {
+						listInstance(instance);
+						instancesPrivateIPs.put(instance.getInstanceId(), instance.getPrivateIpAddress());
+						instancesPublicIPs.put(instance.getInstanceId(), instance.getPublicIpAddress());
+					}
 		        }
 		    }
 
