@@ -29,7 +29,9 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.Tag;
-
+import com.amazonaws.services.ec2.model.CreateTagsResult;
+import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
+import com.amazonaws.services.ec2.model.DryRunResult;
 public class InstancesOperations {
 
 	private Map<String, String> instancesPrivateIPs = new HashMap<String, String>();
@@ -38,7 +40,7 @@ public class InstancesOperations {
 	private static final String node_AMI_ID = "ami-3841df47";
 	private static final String security_group_ID = "sg-1e70ff57";
 	private static final String subnet_ID = "subnet-b9555edd";
-	private static final String instance_TYPE = InstanceType.T2Micro;
+	private static final String instance_TYPE = InstanceType.T2Micro.toString();
 	private static final String keyName = "CNV-aws";
 
 	
@@ -125,7 +127,7 @@ public class InstancesOperations {
 		run_request.withMinCount(1);
 		run_request.withSubnetId(subnet_ID);
 		run_request.withSecurityGroups(security_group_ID);
-		run_request.withMonitoring(1);
+		run_request.withMonitoring(true);
 		run_request.withRequestCredentialsProvider(credentialsProvider);
 		run_request.withKeyName(keyName);
 		
@@ -197,9 +199,9 @@ public class InstancesOperations {
 
             return request.getDryRunRequest();
         };*/
-        StartInstancesRequest request = new StartInstancesRequest()
+        StartInstancesRequest startRequest = new StartInstancesRequest()
                 .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StartInstancesRequest> dry_request = request.getDryRunRequest();
+        DryRunSupportedRequest<StartInstancesRequest> dry_request = startRequest.getDryRunRequest();
 
         DryRunResult dry_response = ec2.dryRun(dry_request);
 
@@ -238,9 +240,9 @@ public class InstancesOperations {
 
             return request.getDryRunRequest();
         };*/
-        StopInstancesRequest request = new StopInstancesRequest()
+        StopInstancesRequest stopRequest = new StopInstancesRequest()
                 .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StopInstancesRequest> dry_request = request.getDryRunRequest();
+        DryRunSupportedRequest<StopInstancesRequest> dry_request = stopRequest.getDryRunRequest();
 	
         DryRunResult dry_response = ec2.dryRun(dry_request);
 

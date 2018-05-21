@@ -22,19 +22,19 @@ public class AutoScalerCheck extends TimerTask {
         
         List<String> ipsToRemove = new ArrayList<String>();
         /* Find instances below threshold and stop them */
-        for(String ip: nodesByIp.getKeySet()){
+        for(String ip: nodesByIp.keySet()){
         	NodeInfo node = nodesByIp.get(ip);
-        	List<double> cpuLoadList = node.getCpuLoadList();
+        	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();
-        		InstanceOperations instanceOps = mazeRunnerNodeManager.getInstanceOperationsInstance();
+        		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
         		instanceOps.stopInstance(instanceId);
         		ipsToRemove.add(ip);
         	}
         	else if(isUpperThreshold(cpuLoadList)){
-        		InstanceOperations instanceOps = mazeRunnerNodeManager.getInstanceOperationsInstance();
+        		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
         		instanceOps.createInstance();
-        		instanceOps.getInstanceIps();
+        		instanceOps.getInstancesIPs();
         	}
         	mazeRunnerNodeManager.getNodesByIp().get(ip).resetCpuLoadList();
         }
@@ -44,10 +44,10 @@ public class AutoScalerCheck extends TimerTask {
         }
     }
     
-    public Boolean isBelowThreshold(List<double> cpuLoadList){
+    public Boolean isBelowThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
-    		if(d < threshold)
+    		if(d < lthreshold)
     			count++;
     	}
     	if(count == cpuLoadList.size())
@@ -55,10 +55,10 @@ public class AutoScalerCheck extends TimerTask {
     	return false;
     }
     
-    public Boolean isUpperThreshold(List<double> cpuLoadList){
+    public Boolean isUpperThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
-    		if(d > threshold)
+    		if(d > hthreshold)
     			count++;
     	}
     	if(count == cpuLoadList.size())
