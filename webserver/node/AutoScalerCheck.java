@@ -29,7 +29,7 @@ public class AutoScalerCheck extends TimerTask {
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();
         		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
-        		instanceOps.stopInstance(instanceId);
+        		instanceOps.terminateInstance(instanceId);
         		ipsToRemove.add(ip);
         	}
         	else if(isUpperThreshold(cpuLoadList)){
@@ -51,7 +51,6 @@ public class AutoScalerCheck extends TimerTask {
     	for(Double d: cpuLoadList){
     		if(d < lthreshold)
     			count++;
-    	}
     	if(count == cpuLoadList.size())
     		return true;
     	return false;

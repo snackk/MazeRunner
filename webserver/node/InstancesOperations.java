@@ -137,22 +137,12 @@ public class InstancesOperations {
 		String instance_id = response.getReservation().getInstances()
                                       .get(0).getInstanceId();
 		System.out.println("New instance -> " + instance_id);
-		/*Tag tag = new Tag();
-		tag.withKey("Name");
-	        tag.withValue(instance_id); 
-
-		CreateTagsRequest tag_request = new CreateTagsRequest();
-		    tag_request.withTags(tag);
-
-		ec2.createTags(tag_request);
 		
-		CreateTagsResult tag_response = ec2.createTags(tag_request);
-		*/	
 		System.out.printf(
 		        "Successfully created EC2 instance %s based on AMI %s",
 		        instance_id, node_AMI_ID);
 		
-		startInstance(instance_id);
+		//startInstance(instance_id);
 		
 		return instance_id;
 	}
@@ -191,37 +181,24 @@ public class InstancesOperations {
 			    e);
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-/*
-        DryRunSupportedRequest<StartInstancesRequest> dry_request =
-            () -> {
-            StartInstancesRequest request = new StartInstancesRequest()
-                .withInstanceIds(instance_id);
-
-            return request.getDryRunRequest();
-        };*/
-        /*StartInstancesRequest startRequest = new StartInstancesRequest()
-                .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StartInstancesRequest> dry_request = startRequest.getDryRunRequest();
-
-        DryRunResult dry_response = ec2.dryRun(dry_request);
-
-        if(!dry_response.isSuccessful()) {
-            System.out.printf(
-                "Failed dry run to start instance %s", instance_id);
-
-            throw dry_response.getDryRunResponse();
-        }*/
 
         StartInstancesRequest request = new StartInstancesRequest()
             .withInstanceIds(instance_id);
 
-        ec2.startInstances(request);
-	System.out.println("Starting a  instance " + instance_id + "...");
-//	Thread.sleep(60000);
-        System.out.printf("Successfully started instance %s", instance_id);
+        try{
+	        ec2.startInstances(request);
+			System.out.println("Starting a  instance " + instance_id + "...");
+			Thread.sleep(60000);
+		    System.out.printf("Successfully started instance %s", instance_id);
+        } catch (AmazonServiceException ase) {
+            System.out.println("Caught Exception: " + ase.getMessage());
+            System.out.println("Reponse Status Code: " + ase.getStatusCode());
+            System.out.println("Error Code: " + ase.getErrorCode());
+            System.out.println("Request ID: " + ase.getRequestId());
+        }
     }
 	
-	public void stopInstance(String instance_id) {
+	public void terminateInstance(String instance_id) {
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 		    credentialsProvider.getCredentials();
@@ -233,32 +210,11 @@ public class InstancesOperations {
 			    e);
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-/*
-        DryRunSupportedRequest<StopInstancesRequest> dry_request =
-            () -> {
-            StopInstancesRequest request = new StopInstancesRequest()
-                .withInstanceIds(instance_id);
 
-            return request.getDryRunRequest();
-        };*/
-       /* StopInstancesRequest stopRequest = new StopInstancesRequest()
-                .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StopInstancesRequest> dry_request = stopRequest.getDryRunRequest();
-	
-        DryRunResult dry_response = ec2.dryRun(dry_request);
-
-        if(!dry_response.isSuccessful()) {
-            System.out.printf(
-                "Failed dry run to stop instance %s", instance_id);
-            throw dry_response.getDryRunResponse();
-        }
-	*/
-        StopInstancesRequest request = new StopInstancesRequest()
-            .withInstanceIds(instance_id);
-
-        ec2.stopInstances(request);
-
-        System.out.printf("Successfully stop instance %s", instance_id);
+		System.out.println("Terminating the instance %s", instance_id);
+        TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
+        termInstanceReq.withInstanceIds(instance_id);
+        ec2.terminateInstances(termInstanceReq);
 	}
 
 	public double getInstanceAverageLoad(String instanceId) {
