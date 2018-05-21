@@ -6,6 +6,7 @@ import java.util.Map;
 public class NodeInfo {
 
     private double cpuLoad = 0;
+    private List<double> cpuLoadList = new ArrayList<double>();
 
     private String lastRequest = "";
 
@@ -21,9 +22,18 @@ public class NodeInfo {
     public double getCpuLoad() {
         return cpuLoad;
     }
+    
+    public List<double> getCpuLoadList() {
+        return cpuLoadList;
+    }
 
     public void setCpuLoad(double cpuLoad) {
         this.cpuLoad = cpuLoad;
+        this.cpuLoadList.add(cpuLoad);
+    }
+    
+    public void resetCpuLoadList(){
+    	this.cpuLoadList = new ArrayList<double>();
     }
 
     public String getLastRequest() {

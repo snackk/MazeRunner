@@ -74,7 +74,7 @@ public class MazeRunnerNodeManager {
         	InstanceOperations instanceOps = InstanceOperations.getInstance();
         	String instanceId = instanceOps.createInstance();
         	instanceOps.getInstanceIps();
-        	solveMazeOnNode(request);
+        	solveMazeOnNode(request); //FIXME ?
         }
 
         URL newEndpoint = null;
@@ -157,7 +157,6 @@ public class MazeRunnerNodeManager {
                 break;
             }
         }
-
         return nodeToProcessRequest;
     }
 

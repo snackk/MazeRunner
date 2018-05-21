@@ -135,7 +135,6 @@ public class InstancesOperations {
 
 		String instance_id = response.getReservation().getReservationId();
 
-		//FIX ME TAG
 		Tag tag = new Tag();
 		tag.withKey("Name");
 	    tag.withValue(instance_id); 
@@ -283,7 +282,7 @@ public class InstancesOperations {
 			Datapoint dp = (Datapoint) aDataPoint;
 			avgCPUUtilization = dp.getAverage();
 		}
-
+		
 		return avgCPUUtilization;
 	}
 }

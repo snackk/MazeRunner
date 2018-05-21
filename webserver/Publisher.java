@@ -38,6 +38,9 @@ public class Publisher {
 
         /*Perform health checks each minute*/
         Timer t1 = new Timer();
+        Timer t2 = new Timer();
         t1.schedule(new HealthCheck(), 0,60000);
+        t2.schedule(new AutoScalerCheck(), 0,60000*5);
+
     }
 }
