@@ -24,16 +24,18 @@ public class AutoScalerCheck extends TimerTask {
         /* Find instances below threshold and stop them */
         for(String ip: nodesByIp.keySet()){
         	System.out.println(ip);
-		NodeInfo node = nodesByIp.get(ip);
+        	NodeInfo node = nodesByIp.get(ip);
         	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();
         		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
+        		System.out.println("Auto Scaler stoping instance %s", instanceId);
         		instanceOps.terminateInstance(instanceId);
         		ipsToRemove.add(ip);
         	}
         	else if(isUpperThreshold(cpuLoadList)){
         		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
+        		System.out.println("Auto Scaler creating instance");
         		instanceOps.createInstance();
         		instanceOps.getInstancesIPs();
         	}
