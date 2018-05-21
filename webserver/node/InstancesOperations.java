@@ -88,25 +88,6 @@ public class InstancesOperations {
 		    }
 		}
 	}
-
-	public void listInstance(Instance instance) {
-		System.out.printf(
-                "Found reservation with id %s, " +
-                "AMI %s, " +
-                "type %s, " +
-                "state %s " +
-                "monitoring state %s" +
-                "with private ip %s" +
-                "and public ip %s",
-                instance.getInstanceId(),
-                instance.getImageId(),
-                instance.getInstanceType(),
-                instance.getState().getName(),
-                instance.getMonitoring().getState(),
-                instance.getPrivateIpAddress(),
-                instance.getPublicIpAddress());
-            System.out.println("");
-	}
 	
 	public String createInstance(){
 		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
@@ -145,28 +126,6 @@ public class InstancesOperations {
 		//startInstance(instance_id);
 		
 		return instance_id;
-	}
-	
-	public void rebootInstance(String instance_id){
-		AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
-		try {
-		    credentialsProvider.getCredentials();
-		} catch (Exception e) {
-		    throw new AmazonClientException(
-			    "Cannot load the credentials from the credential profiles file. " +
-			    "Please make sure that your credentials file is at the correct " +
-			    "location (~/.aws/credentials), and is in valid format.",
-			    e);
-		}
-		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-
-        RebootInstancesRequest request = new RebootInstancesRequest();
-        request.withInstanceIds(instance_id);
-
-        RebootInstancesResult response = ec2.rebootInstances(request);
-
-        if(response!=null)
-        	System.out.printf("Successfully rebooted instance %s", instance_id);
 	}
 	
 	public void startInstance(String instance_id) {
