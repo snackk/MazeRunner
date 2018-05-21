@@ -135,7 +135,7 @@ public class MSSManager {
 
 			ScanRequest scanRequest = new ScanRequest(METRICS_TABLE_NAME).withScanFilter(scanFilter);
 			scanResult = dynamoDB.scan(scanRequest);
-			System.out.println("Result :" + scanResult);
+			//System.out.println("Result :" + scanResult);
 
 		} catch (Exception e) {
 		    System.err.println("Unable to scan the table: " + e.getMessage());

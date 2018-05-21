@@ -22,7 +22,7 @@ public class AutoScalerCheck extends TimerTask {
         
         List<String> ipsToRemove = new ArrayList<String>();
         /* Find instances below threshold and stop them */
-        for(String ip: nodesByIp.getKeySet()){
+        for(String ip: nodesByIp.keySet()){
         	NodeInfo node = nodesByIp.get(ip);
         	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
@@ -36,6 +36,7 @@ public class AutoScalerCheck extends TimerTask {
         		instanceOps.createInstance();
         		instanceOps.getInstancesIPs();
         	}
+		System.out.println(mazeRunnerNodeManager.getNodesByIp());
         	mazeRunnerNodeManager.getNodesByIp().get(ip).resetCpuLoadList();
         }
         /* Remove nodes from list who were stopped */

@@ -199,9 +199,9 @@ public class InstancesOperations {
 
             return request.getDryRunRequest();
         };*/
-        StartInstancesRequest request = new StartInstancesRequest()
+        /*StartInstancesRequest startRequest = new StartInstancesRequest()
                 .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StartInstancesRequest> dry_request = request.getDryRunRequest();
+        DryRunSupportedRequest<StartInstancesRequest> dry_request = startRequest.getDryRunRequest();
 
         DryRunResult dry_response = ec2.dryRun(dry_request);
 
@@ -210,7 +210,7 @@ public class InstancesOperations {
                 "Failed dry run to start instance %s", instance_id);
 
             throw dry_response.getDryRunResponse();
-        }
+        }*/
 
         StartInstancesRequest request = new StartInstancesRequest()
             .withInstanceIds(instance_id);
@@ -240,9 +240,9 @@ public class InstancesOperations {
 
             return request.getDryRunRequest();
         };*/
-        StopInstancesRequest request = new StopInstancesRequest()
+       /* StopInstancesRequest stopRequest = new StopInstancesRequest()
                 .withInstanceIds(instance_id);
-        DryRunSupportedRequest<StopInstancesRequest> dry_request = request.getDryRunRequest();
+        DryRunSupportedRequest<StopInstancesRequest> dry_request = stopRequest.getDryRunRequest();
 	
         DryRunResult dry_response = ec2.dryRun(dry_request);
 
@@ -251,7 +251,7 @@ public class InstancesOperations {
                 "Failed dry run to stop instance %s", instance_id);
             throw dry_response.getDryRunResponse();
         }
-
+	*/
         StopInstancesRequest request = new StopInstancesRequest()
             .withInstanceIds(instance_id);
 
