@@ -24,7 +24,7 @@ public class AutoScalerCheck extends TimerTask {
         /* Find instances below threshold and stop them */
         for(String ip: nodesByIp.getKeySet()){
         	NodeInfo node = nodesByIp.get(ip);
-        	List<double> cpuLoadList = node.getCpuLoadList();
+        	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();
         		InstanceOperations instanceOps = mazeRunnerNodeManager.getInstanceOperationsInstance();
@@ -44,22 +44,22 @@ public class AutoScalerCheck extends TimerTask {
         }
     }
     
-    public Boolean isBelowThreshold(List<double> cpuLoadList){
+    public Boolean isBelowThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
     		if(d < threshold)
-    			count++
+    			count++;
     	}
     	if(count == cpuLoadList.size())
     		return true;
     	return false;
     }
     
-    public Boolean isUpperThreshold(List<double> cpuLoadList){
+    public Boolean isUpperThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
     		if(d > threshold)
-    			count++
+    			count++;
     	}
     	if(count == cpuLoadList.size())
     		return true;

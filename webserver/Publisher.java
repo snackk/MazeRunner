@@ -6,6 +6,8 @@ import webserver.handler.RequestHandler;
 import webserver.handler.TestHandler;
 import webserver.node.HealthCheck;
 import webserver.node.MazeRunnerNodeManager;
+import webserver.node.AutoScalerCheck;
+
 import com.sun.net.httpserver.HttpServer;
 
 import java.net.InetSocketAddress;

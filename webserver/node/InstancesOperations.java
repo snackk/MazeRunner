@@ -38,7 +38,7 @@ public class InstancesOperations {
 	private static final String node_AMI_ID = "ami-3841df47";
 	private static final String security_group_ID = "sg-1e70ff57";
 	private static final String subnet_ID = "subnet-b9555edd";
-	private static final String instance_TYPE = InstanceType.T2Micro;
+	private static final String instance_TYPE = InstanceType.T2Micro.toString();
 	private static final String keyName = "CNV-aws";
 
 	
@@ -189,14 +189,17 @@ public class InstancesOperations {
 			    e);
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-
+/*
         DryRunSupportedRequest<StartInstancesRequest> dry_request =
             () -> {
             StartInstancesRequest request = new StartInstancesRequest()
                 .withInstanceIds(instance_id);
 
             return request.getDryRunRequest();
-        };
+        };*/
+        StartInstancesRequest request = new StartInstancesRequest()
+                .withInstanceIds(instance_id);
+        DryRunSupportedRequest<StartInstancesRequest> dry_request = request.getDryRunRequest();
 
         DryRunResult dry_response = ec2.dryRun(dry_request);
 
@@ -227,15 +230,18 @@ public class InstancesOperations {
 			    e);
 		}
 		AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentialsProvider.getCredentials())).build();
-
+/*
         DryRunSupportedRequest<StopInstancesRequest> dry_request =
             () -> {
             StopInstancesRequest request = new StopInstancesRequest()
                 .withInstanceIds(instance_id);
 
             return request.getDryRunRequest();
-        };
-
+        };*/
+        StopInstancesRequest request = new StopInstancesRequest()
+                .withInstanceIds(instance_id);
+        DryRunSupportedRequest<StopInstancesRequest> dry_request = request.getDryRunRequest();
+	
         DryRunResult dry_response = ec2.dryRun(dry_request);
 
         if(!dry_response.isSuccessful()) {
