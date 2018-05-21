@@ -29,7 +29,9 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StopInstancesRequest;
 import com.amazonaws.services.ec2.model.Tag;
-
+import com.amazonaws.services.ec2.model.CreateTagsResult;
+import com.amazonaws.services.ec2.model.DryRunSupportedRequest;
+import com.amazonaws.services.ec2.model.DryRunResult;
 public class InstancesOperations {
 
 	private Map<String, String> instancesPrivateIPs = new HashMap<String, String>();
@@ -125,7 +127,7 @@ public class InstancesOperations {
 		run_request.withMinCount(1);
 		run_request.withSubnetId(subnet_ID);
 		run_request.withSecurityGroups(security_group_ID);
-		run_request.withMonitoring(1);
+		run_request.withMonitoring(true);
 		run_request.withRequestCredentialsProvider(credentialsProvider);
 		run_request.withKeyName(keyName);
 		

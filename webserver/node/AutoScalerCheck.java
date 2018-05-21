@@ -27,14 +27,14 @@ public class AutoScalerCheck extends TimerTask {
         	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();
-        		InstanceOperations instanceOps = mazeRunnerNodeManager.getInstanceOperationsInstance();
+        		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
         		instanceOps.stopInstance(instanceId);
         		ipsToRemove.add(ip);
         	}
         	else if(isUpperThreshold(cpuLoadList)){
-        		InstanceOperations instanceOps = mazeRunnerNodeManager.getInstanceOperationsInstance();
+        		InstancesOperations instanceOps = mazeRunnerNodeManager.getInstancesOperationsInstance();
         		instanceOps.createInstance();
-        		instanceOps.getInstanceIps();
+        		instanceOps.getInstancesIPs();
         	}
         	mazeRunnerNodeManager.getNodesByIp().get(ip).resetCpuLoadList();
         }
@@ -47,7 +47,7 @@ public class AutoScalerCheck extends TimerTask {
     public Boolean isBelowThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
-    		if(d < threshold)
+    		if(d < lthreshold)
     			count++;
     	}
     	if(count == cpuLoadList.size())
@@ -58,7 +58,7 @@ public class AutoScalerCheck extends TimerTask {
     public Boolean isUpperThreshold(List<Double> cpuLoadList){
     	int count = 0;
     	for(Double d: cpuLoadList){
-    		if(d > threshold)
+    		if(d > hthreshold)
     			count++;
     	}
     	if(count == cpuLoadList.size())
