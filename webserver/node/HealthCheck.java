@@ -51,12 +51,13 @@ public class HealthCheck extends TimerTask {
             System.out.println("CPU usage: " + cpuUsage);
 
             double parcialCpuUsage = 0D;
-            for(double basicBlock : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
-                double cpuPerBB = nodeInfo.getCpuUsageByBasicBlocks().get(basicBlock);
+            for(BasicBlock block : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
+                double cpuPerBB = nodeInfo.getCpuUsageByBasicBlocks().get(block);
                 if(cpuPerBB != -1D) {
-                    parcialCpuUsage += cpuPerBB;
+                    if(block.isUsed())
+                        parcialCpuUsage += cpuPerBB;
                 } else {
-                    nodeInfo.getCpuUsageByBasicBlocks().put(basicBlock, (cpuUsage - parcialCpuUsage));
+                    nodeInfo.getCpuUsageByBasicBlocks().put(block, (cpuUsage - parcialCpuUsage));
                 }
             }
         }

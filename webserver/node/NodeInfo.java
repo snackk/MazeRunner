@@ -1,17 +1,20 @@
 package webserver.node;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NodeInfo {
 
     private double cpuLoad = 0;
-    private List<double> cpuLoadList = new ArrayList<double>();
+    private List<Double> cpuLoadList = new ArrayList<Double>();
 
     private String lastRequest = "";
+    private BasicBlock lastBlock = null;
 
     /*<BasicBlock, CpuUsage>*/
-    private Map<Double, Double> cpuUsageByBasicBlocks = new HashMap<>();
+    private Map<BasicBlock, Double> cpuUsageByBasicBlocks = new HashMap<>();
 
     private String instanceId;
 
@@ -23,7 +26,7 @@ public class NodeInfo {
         return cpuLoad;
     }
     
-    public List<double> getCpuLoadList() {
+    public List<Double> getCpuLoadList() {
         return cpuLoadList;
     }
 
@@ -33,7 +36,7 @@ public class NodeInfo {
     }
     
     public void resetCpuLoadList(){
-    	this.cpuLoadList = new ArrayList<double>();
+    	this.cpuLoadList = new ArrayList<Double>();
     }
 
     public String getLastRequest() {
@@ -44,11 +47,41 @@ public class NodeInfo {
         this.lastRequest = lastRequest;
     }
 
-    public Map<Double, Double> getCpuUsageByBasicBlocks() {
+    public Map<BasicBlock, Double> getCpuUsageByBasicBlocks() {
         return cpuUsageByBasicBlocks;
     }
 
     public String getInstanceId() {
         return instanceId;
+    }
+
+    public BasicBlock getLastBlock() {
+        return lastBlock;
+    }
+
+    public void setLastBlock(BasicBlock lastBlock) {
+        this.lastBlock = lastBlock;
+    }
+}
+
+class BasicBlock {
+
+    private Double basicBlock;
+    private Boolean isUsed = true;
+
+    public BasicBlock(Double basicBlock) {
+        this.basicBlock = basicBlock;
+    }
+
+    public Double getBasicBlock() {
+        return basicBlock;
+    }
+
+    public Boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(Boolean used) {
+        isUsed = used;
     }
 }

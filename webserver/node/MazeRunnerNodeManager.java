@@ -29,7 +29,7 @@ public class MazeRunnerNodeManager {
 
     /*Nodes*/
     private static Map<String, NodeInfo> nodesByIp = new HashMap<>();
-    private static double nodeMaxLoad = 90D;
+    private static double nodeMaxLoad = 0.90;
 
     /*Linear Regression*/
     private enum paramsType {x0, y0, x1, y1, v, s, m}
@@ -71,9 +71,9 @@ public class MazeRunnerNodeManager {
 
         } catch (NotEnoughNodesException e) {
             /* The AutoScaler should kick in here to start a new instance */
-        	InstanceOperations instanceOps = InstanceOperations.getInstance();
+        	InstancesOperations instanceOps = InstancesOperations.getInstance();
         	String instanceId = instanceOps.createInstance();
-        	instanceOps.getInstanceIps();
+        	instanceOps.getInstancesIPs();
         	solveMazeOnNode(request); //FIXME ?
         }
 
@@ -92,6 +92,7 @@ public class MazeRunnerNodeManager {
         String toReturn =  mazeRunnerService.solveMaze(request);
 
         /*The request has already been processed here.*/
+        nodesByIp.get(workerIp).getLastBlock().setUsed(false);
         return toReturn;
     }
 
@@ -115,8 +116,10 @@ public class MazeRunnerNodeManager {
                 System.out.println("Reported: " + nodeInfo.getCpuUsageByBasicBlocks().keySet().size());
                 System.out.println(nodeInfo);
 
-                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1D);
+                BasicBlock bb = new BasicBlock(requestBasicBlocksEstimation);
+                nodeInfo.getCpuUsageByBasicBlocks().put(bb, -1D);
                 nodeInfo.setLastRequest(request);
+                nodeInfo.setLastBlock(bb);
                 nodeInfoToRequest = nodeInfo;
                 break;
             }
@@ -124,7 +127,8 @@ public class MazeRunnerNodeManager {
             /*Choose the closest Basic Block to Our Request*/
             Double basicBlock = 0D;
             Double deviation = null;
-            for(Double nodeBasicBlock : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
+            for(BasicBlock block : nodeInfo.getCpuUsageByBasicBlocks().keySet()) {
+                Double nodeBasicBlock = block.getBasicBlock();
                 Double temp = Math.abs(requestBasicBlocksEstimation - nodeBasicBlock);
                 if(deviation == null || temp < deviation) {
                     deviation = temp;
@@ -137,8 +141,10 @@ public class MazeRunnerNodeManager {
             double estimateCpuUsage = (requestBasicBlocksEstimation * cpuUsageOfBasicBlock) / basicBlock;
 
             if((nodeInfo.getCpuLoad() + estimateCpuUsage) <= nodeMaxLoad) {
-                nodeInfo.getCpuUsageByBasicBlocks().put(requestBasicBlocksEstimation, -1D);
+                BasicBlock bb = new BasicBlock(requestBasicBlocksEstimation);
+                nodeInfo.getCpuUsageByBasicBlocks().put(bb, -1D);
                 nodeInfo.setLastRequest(request);
+                nodeInfo.setLastBlock(bb);
                 nodeInfoToRequest = nodeInfo;
                 break;
             }
