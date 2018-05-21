@@ -23,7 +23,8 @@ public class AutoScalerCheck extends TimerTask {
         List<String> ipsToRemove = new ArrayList<String>();
         /* Find instances below threshold and stop them */
         for(String ip: nodesByIp.keySet()){
-        	NodeInfo node = nodesByIp.get(ip);
+        	System.out.println(ip);
+		NodeInfo node = nodesByIp.get(ip);
         	List<Double> cpuLoadList = node.getCpuLoadList();
         	if(isBelowThreshold(cpuLoadList)){
         		String instanceId = node.getInstanceId();

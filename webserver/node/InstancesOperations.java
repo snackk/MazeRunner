@@ -74,9 +74,8 @@ public class InstancesOperations {
 
 		    for(Reservation reservation : response.getReservations()) {
 		        for(Instance instance : reservation.getInstances()) {
-		        	//TODO Hackish way of not registering LoadBalancer.
-					//Replace it by a smarter way
-		        	if(!instance.getInstanceId().equals("i-0883300a5cd3d612f")) {
+		        	//TODO must also check if wsdl has been published
+		        	if(instance.getImageId().equals(node_AMI_ID) && instance.getState().getCode() == 16) {
 						listInstance(instance);
 						instancesPrivateIPs.put(instance.getInstanceId(), instance.getPrivateIpAddress());
 						instancesPublicIPs.put(instance.getInstanceId(), instance.getPublicIpAddress());
@@ -125,8 +124,8 @@ public class InstancesOperations {
 		run_request.withInstanceType(instance_TYPE);
 		run_request.withMaxCount(1);
 		run_request.withMinCount(1);
-		run_request.withSubnetId(subnet_ID);
-		run_request.withSecurityGroups(security_group_ID);
+		//run_request.withSubnetId(subnet_ID);
+		run_request.withSecurityGroups("Omega");
 		run_request.withMonitoring(true);
 		run_request.withRequestCredentialsProvider(credentialsProvider);
 		run_request.withKeyName(keyName);
@@ -135,11 +134,12 @@ public class InstancesOperations {
 
 		RunInstancesResult response = ec2.runInstances(run_request);
 
-		String instance_id = response.getReservation().getReservationId();
-
-		Tag tag = new Tag();
+		String instance_id = response.getReservation().getInstances()
+                                      .get(0).getInstanceId();
+		System.out.println("New instance -> " + instance_id);
+		/*Tag tag = new Tag();
 		tag.withKey("Name");
-	    tag.withValue(instance_id); 
+	        tag.withValue(instance_id); 
 
 		CreateTagsRequest tag_request = new CreateTagsRequest();
 		    tag_request.withTags(tag);
@@ -147,7 +147,7 @@ public class InstancesOperations {
 		ec2.createTags(tag_request);
 		
 		CreateTagsResult tag_response = ec2.createTags(tag_request);
-		
+		*/	
 		System.out.printf(
 		        "Successfully created EC2 instance %s based on AMI %s",
 		        instance_id, node_AMI_ID);
@@ -216,7 +216,8 @@ public class InstancesOperations {
             .withInstanceIds(instance_id);
 
         ec2.startInstances(request);
-
+	System.out.println("Starting a  instance " + instance_id + "...");
+//	Thread.sleep(60000);
         System.out.printf("Successfully started instance %s", instance_id);
     }
 	

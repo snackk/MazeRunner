@@ -62,7 +62,10 @@ public class MazeRunnerNodeManager {
 
         /*If there aren't any Nodes registered*/
         if(getNodesByIp().size() == 0){
-            throw new NoActiveNodesException();
+	    System.out.println("Creating...");
+            InstancesOperations instanceOps = new InstancesOperations();
+            String instanceId = instanceOps.createInstance();
+
         }
 
 	    String workerIp = "";
@@ -71,9 +74,9 @@ public class MazeRunnerNodeManager {
 
         } catch (NotEnoughNodesException e) {
             /* The AutoScaler should kick in here to start a new instance */
-        	InstancesOperations instanceOps = new InstancesOperations();
-        	String instanceId = instanceOps.createInstance();
-        	instanceOps.getInstancesIPs();
+        	//InstancesOperations instanceOps = new InstancesOperations();
+        	//String instanceId = instanceOps.createInstance();
+        	//instanceOps.getInstancesIPs();
         	solveMazeOnNode(request); //FIXME ?
         }
 
@@ -170,7 +173,6 @@ public class MazeRunnerNodeManager {
         InstancesOperations instancesOps = getInstancesOperationsInstance();
         instancesOps.getInstancesIPs();
         Map<String, String> privateIps = instancesOps.getInstancesPrivateIPs();
-
         for(String instanceId : privateIps.keySet()){
             nodesByIp.put(privateIps.get(instanceId), new NodeInfo(instanceId));
             System.out.println("MazeRunnerNode with public ip " + privateIps.get(instanceId) + " is up.");
